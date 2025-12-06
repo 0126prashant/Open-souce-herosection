@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { motion, useTransform, useSpring, useMotionValue } from "framer-motion";
 import FlipCard, { AnimationPhase } from "./FlipCard";
 
 // --- Configuration ---
 const TOTAL_IMAGES = 20;
+const MAX_SCROLL = 3000; // Virtual scroll range
 
 // Unsplash Images
 const IMAGES = [
@@ -48,17 +49,54 @@ export default function Hero() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // --- Scroll Logic ---
-    const { scrollY } = useScroll();
+    // --- Virtual Scroll Logic ---
+    const virtualScroll = useMotionValue(0);
+    const scrollRef = useRef(0); // Keep track of scroll value without re-renders
+
+    useEffect(() => {
+        const handleWheel = (e: WheelEvent) => {
+            // Prevent default to stop browser overscroll/bounce
+            // e.preventDefault(); // Optional: might block other interactions if not careful
+
+            const newScroll = Math.min(Math.max(scrollRef.current + e.deltaY, 0), MAX_SCROLL);
+            scrollRef.current = newScroll;
+            virtualScroll.set(newScroll);
+        };
+
+        // Touch support
+        let touchStartY = 0;
+        const handleTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY;
+        };
+        const handleTouchMove = (e: TouchEvent) => {
+            const touchY = e.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+            touchStartY = touchY;
+
+            const newScroll = Math.min(Math.max(scrollRef.current + deltaY, 0), MAX_SCROLL);
+            scrollRef.current = newScroll;
+            virtualScroll.set(newScroll);
+        };
+
+        window.addEventListener("wheel", handleWheel, { passive: false });
+        window.addEventListener("touchstart", handleTouchStart, { passive: false });
+        window.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+        return () => {
+            window.removeEventListener("wheel", handleWheel);
+            window.removeEventListener("touchstart", handleTouchStart);
+            window.removeEventListener("touchmove", handleTouchMove);
+        };
+    }, [virtualScroll]);
 
     // 1. Morph Progress: 0 (Circle) -> 1 (Bottom Arc)
     // Happens between scroll 0 and 600
-    const morphProgress = useTransform(scrollY, [0, 600], [0, 1]);
+    const morphProgress = useTransform(virtualScroll, [0, 600], [0, 1]);
     const smoothMorph = useSpring(morphProgress, { stiffness: 40, damping: 20 });
 
     // 2. Scroll Rotation (Shuffling): Starts after morph (e.g., > 600)
     // Rotates the bottom arc as user continues scrolling
-    const scrollRotate = useTransform(scrollY, [600, 3000], [0, 360]);
+    const scrollRotate = useTransform(virtualScroll, [600, 3000], [0, 360]);
     const smoothScrollRotate = useSpring(scrollRotate, { stiffness: 40, damping: 20 });
 
     // --- Mouse Parallax ---
@@ -95,15 +133,6 @@ export default function Hero() {
     }, []);
 
     // --- Render Loop (Manual Calculation for Morph) ---
-    // We need to calculate the state of each card on every render because
-    // we are blending two complex states (Circle vs Arc) based on a spring value.
-
-    // Note: In a production app with heavy logic, we might optimize this, 
-    // but for 20 items it's fine.
-
-    // We use a state to force re-render when spring changes if needed, 
-    // but framer-motion handles animating values. 
-    // However, since we need to LERP positions in JS, we need to observe the spring.
     const [morphValue, setMorphValue] = useState(0);
     const [rotateValue, setRotateValue] = useState(0);
     const [parallaxValue, setParallaxValue] = useState(0);
@@ -119,13 +148,18 @@ export default function Hero() {
         };
     }, [smoothMorph, smoothScrollRotate, smoothMouseX]);
 
-    return (
-        <div className="relative h-[400vh] bg-[#FAFAFA] overflow-x-hidden">
-            {/* Sticky Container */}
-            <div className="sticky top-0 flex h-screen w-screen flex-col items-center justify-center overflow-hidden perspective-1000">
+    // --- Content Opacity ---
+    // Fade in content when arc is formed (morphValue > 0.8)
+    const contentOpacity = useTransform(smoothMorph, [0.8, 1], [0, 1]);
+    const contentY = useTransform(smoothMorph, [0.8, 1], [20, 0]);
 
-                {/* Center Text */}
-                <div className="absolute z-0 flex flex-col items-center justify-center text-center pointer-events-none">
+    return (
+        <div className="relative h-screen w-screen bg-[#FAFAFA] overflow-hidden">
+            {/* Container */}
+            <div className="flex h-full w-full flex-col items-center justify-center perspective-1000">
+
+                {/* Intro Text (Fades out) */}
+                <div className="absolute z-0 flex flex-col items-center justify-center text-center pointer-events-none top-1/2 -translate-y-1/2">
                     <motion.h1
                         initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
                         animate={introPhase === "circle" && morphValue < 0.5 ? { opacity: 1 - morphValue * 2, y: 0, filter: "blur(0px)" } : { opacity: 0, filter: "blur(10px)" }}
@@ -143,6 +177,20 @@ export default function Hero() {
                         SCROLL TO EXPLORE
                     </motion.p>
                 </div>
+
+                {/* Arc Active Content (Fades in) */}
+                <motion.div
+                    style={{ opacity: contentOpacity, y: contentY }}
+                    className="absolute top-[10%] z-10 flex flex-col items-center justify-center text-center pointer-events-none px-4"
+                >
+                    <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-4">
+                        Explore Our Vision
+                    </h2>
+                    <p className="text-sm md:text-base text-gray-600 max-w-lg leading-relaxed">
+                        Discover a world where technology meets creativity. <br className="hidden md:block" />
+                        Scroll through our curated collection of innovations designed to shape the future.
+                    </p>
+                </motion.div>
 
                 {/* Main Container */}
                 <div className="relative flex items-center justify-center w-full h-full">
@@ -171,46 +219,46 @@ export default function Hero() {
                             };
 
                             // B. Calculate Bottom Arc Position
-                            // Arc center is far below the screen to create a gentle curve
-                            // We want ~7 images visible.
-                            // If radius is large, the arc is flatter.
-                            const arcRadius = windowSize.width * 2;
-                            // We want the top of the arc to be near the bottom of the viewport.
-                            // Viewport center is (0,0). Bottom is windowSize.height/2.
-                            // We want cards to sit around y = windowSize.height/2 - 100 (padding).
-                            const arcTopY = windowSize.height / 2 - 100;
-                            const arcCenterY = arcTopY + arcRadius;
+                            // "Rainbow" Arch: Convex up. Center is highest point.
 
-                            // Spread angle: How wide is the fan of 20 images?
-                            // If we want 7 images to fill the screen width (approx).
-                            // Screen width corresponds to an arc length of windowSize.width.
-                            // Angle for screen width = width / radius = 1 / 2 = 0.5 radians (~28 degrees).
-                            // So 7 images should span ~28 degrees.
-                            // Then 20 images should span (20/7) * 28 ≈ 80 degrees.
-                            const spreadAngle = 80;
+                            // Responsive Logic
+                            const isMobile = windowSize.width < 768;
+
+                            // Radius:
+                            // Keep it slightly tight to maintain the curve.
+                            const arcRadius = windowSize.width * (isMobile ? 1.5 : 1.1);
+
+                            // Position: Move up further as requested.
+                            // Previous was 0.3, moving to 0.25 (higher up).
+                            const arcApexY = windowSize.height * (isMobile ? 0.35 : 0.25);
+                            const arcCenterY = arcApexY + arcRadius;
+
+                            // Spread angle:
+                            // We want 8 cards visible on screen.
+                            // Screen width angle approx 52 degrees.
+                            // 8 cards in ~52 deg -> ~6.5 deg per card.
+                            // Total 20 cards -> ~130 degrees.
+                            const spreadAngle = isMobile ? 100 : 130;
                             const startAngle = -90 - (spreadAngle / 2);
                             const step = spreadAngle / (TOTAL_IMAGES - 1);
 
                             // Apply Scroll Rotation (Shuffle)
-                            // We add rotateValue. 
-                            // rotateValue goes 0 -> 360.
                             const currentArcAngle = startAngle + (i * step) + rotateValue;
                             const arcRad = (currentArcAngle * Math.PI) / 180;
 
                             const arcPos = {
-                                x: Math.cos(arcRad) * arcRadius + parallaxValue, // Add Mouse Parallax
+                                x: Math.cos(arcRad) * arcRadius + parallaxValue,
                                 y: Math.sin(arcRad) * arcRadius + arcCenterY,
                                 rotation: currentArcAngle + 90,
+                                scale: isMobile ? 1.2 : 1.6, // Increased scale as requested
                             };
 
                             // C. Interpolate (Morph)
-                            // If we are fully in circle phase (morphValue = 0), use circlePos.
-                            // If we are fully in arc phase (morphValue = 1), use arcPos.
                             target = {
                                 x: lerp(circlePos.x, arcPos.x, morphValue),
                                 y: lerp(circlePos.y, arcPos.y, morphValue),
                                 rotation: lerp(circlePos.rotation, arcPos.rotation, morphValue),
-                                scale: 1,
+                                scale: lerp(1, arcPos.scale, morphValue),
                                 opacity: 1,
                             };
                         }
@@ -228,9 +276,6 @@ export default function Hero() {
                     })}
                 </div>
             </div>
-
-            {/* Scroll Spacer */}
-            <div className="relative z-10 h-[300vh] pointer-events-none" />
         </div>
     );
 }
