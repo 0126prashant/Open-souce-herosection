@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scroll-Driven Morphing Hero Animation
 
-## Getting Started
+A stunning, interactive hero section built with **Next.js**, **Framer Motion**, and **Tailwind CSS**. This project features a seamless scroll-driven animation that morphs a scattered layout into a circle, and finally into a responsive "rainbow" arc that shuffles through images.
 
-First, run the development server:
+![Demo Placeholder](https://via.placeholder.com/800x450?text=Insert+Demo+Video+or+Image+Here)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   **Advanced Scroll Morph**: Smoothly transitions from a chaotic scatter to a structured circle, then to a bottom arc.
+-   **Virtual Scroll**: Custom virtual scroll implementation for a fixed 100vh experience without native scrollbars.
+-   **Interactive Arc**:
+    -   **Rainbow Geometry**: A visually pleasing, convex-up arc centered on the screen.
+    -   **Continuous Shuffle**: Scroll to rotate the arc and cycle through an infinite loop of images.
+    -   **Mouse Parallax**: The arc reacts subtly to mouse movement for added depth.
+-   **3D Flip Cards**: Hover over any card to reveal details with a smooth 180° 3D flip effect.
+-   **Responsive Design**: Automatically adapts arc radius, spread, and image scale for mobile and desktop screens.
+-   **Dynamic Content**: Contextual headings fade in when the arc is active.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   [Next.js 15](https://nextjs.org/) (App Router)
+-   [Framer Motion](https://www.framer.com/motion/) (Complex Animations)
+-   [Tailwind CSS](https://tailwindcss.com/) (Styling)
+-   [Lucide React](https://lucide.dev/) (Icons)
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/intro-animation.git
+    cd intro-animation
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-## Deploy on Vercel
+4.  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📸 Demo & Screenshots
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Intro Phase
+![Intro Scatter](https://via.placeholder.com/600x300?text=Scatter+Phase)
+
+### Circle Formation
+![Circle Phase](https://via.placeholder.com/600x300?text=Circle+Phase)
+
+### The Rainbow Arc
+![Rainbow Arc](https://via.placeholder.com/600x300?text=Rainbow+Arc)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
