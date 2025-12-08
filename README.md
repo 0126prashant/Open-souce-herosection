@@ -46,13 +46,13 @@ A stunning, interactive hero section built with **Next.js**, **Framer Motion**, 
 ## 📸 Demo & Screenshots
 
 ### Intro Phase
-![Intro Scatter](https://staticservedev.blob.core.windows.net/rodeo/Screenshot%202025-12-08%20at%208.52.18%20AM.png)
+![Intro Scatter](https://staticservedev.blob.core.windows.net/rodeo/Screenshot%202025-12-08%20at%2010.35.09%20AM.png)
 
 ### Circle Formation
-![Circle Phase](https://via.placeholder.com/600x300?text=Circle+Phase)
+![Circle Phase](https://staticservedev.blob.core.windows.net/rodeo/Screenshot%202025-12-08%20at%208.52.18%20AM.png)
 
 ### The Rainbow Arc
-![Rainbow Arc](https://via.placeholder.com/600x300?text=Rainbow+Arc)
+![Rainbow Arc](https://staticservedev.blob.core.windows.net/rodeo/Screenshot%202025-12-08%20at%2010.32.56%20AM.png)
 
 ## 📄 License
 
