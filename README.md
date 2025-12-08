@@ -2,7 +2,7 @@
 
 A stunning, interactive hero section built with **Next.js**, **Framer Motion**, and **Tailwind CSS**. This project features a seamless scroll-driven animation that morphs a scattered layout into a circle, and finally into a responsive "rainbow" arc that shuffles through images.
 
-![Demo Placeholder](https://staticservedev.blob.core.windows.net/rodeo/Screen%20Recording%202025-12-08%20at%208.49.57%20AM.mov)
+![Demo Placeholder](https://github.com/user/repo/assets/123456/video.mp4)
 
 ## ✨ Key Features
 
