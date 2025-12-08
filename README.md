@@ -46,7 +46,7 @@ A stunning, interactive hero section built with **Next.js**, **Framer Motion**, 
 ## 📸 Demo & Screenshots
 
 ### Intro Phase
-![Intro Scatter](https://via.placeholder.com/600x300?text=Scatter+Phase)
+![Intro Scatter](https://staticservedev.blob.core.windows.net/rodeo/Screenshot%202025-12-08%20at%208.52.18%20AM.png)
 
 ### Circle Formation
 ![Circle Phase](https://via.placeholder.com/600x300?text=Circle+Phase)
